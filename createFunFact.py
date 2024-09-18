@@ -2,22 +2,23 @@ from moviepy.editor import *
 from moviepy.config import change_settings
 import requests
 from gtts import gTTS
+import env
 
 IMAGEMAGICK_PATH = r"C:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"
 change_settings({"IMAGEMAGICK_BINARY": IMAGEMAGICK_PATH})
 
 def findLenFact():
     api_url = 'https://api.api-ninjas.com/v1/facts'
-    response = requests.get(api_url, headers={'X-Api-Key': 'A58p2qySrkVl5IevVv9iUw==DEQRx34va7nznCTl'})
+    response = requests.get(api_url, headers={ 'X-Api-Key': env.API_KEY })
     if response.status_code == requests.codes.ok:
         data = response.json()
     else:
         print("Error:", response.status_code, response.text)
 
-    fact = data[0]["fact"]   
+    fact = data[0]["fact"] 
+    splitStr = fact.split(' ')
 
-    if len(fact) >= 10:
-        splitStr = fact.split(' ')
+    if len(splitStr) >= 10:
         newSplit = []
         for i in range(0, len(splitStr)):
             newSplit.append(splitStr[i])
@@ -30,7 +31,6 @@ def findLenFact():
         return findLenFact()
     
 fact = findLenFact()
-print(fact)
 speech = 'fun fact, ' + fact
 
 convertTS = gTTS(text=speech, lang='en-uk', slow=False)
@@ -38,9 +38,8 @@ convertTS = gTTS(text=speech, lang='en-uk', slow=False)
 convertTS.save('audio/randFacts.mp3')
 
 def get_background():
-    client_id = 'Ko4iF-DnABl-jHt3SsLr96hE-IQXhNoyyKHPxrVkJx4'
     query = 'nature'
-    url = f'https://api.unsplash.com/photos/random/?client_id={client_id}&query={query}&orientation=portrait'
+    url = f'https://api.unsplash.com/photos/random/?client_id={env.CLIENT_ID}&query={query}&orientation=portrait'
 
     res = requests.get(url)
     data = res.json()
@@ -62,13 +61,13 @@ audio = AudioFileClip('audio/randFacts.mp3')
 
 duration = audio.duration
 
-bgMusic = AudioFileClip('audio/fsm-team-escp-autumn-dance.mp3').volumex(0.2).set_duration(duration);
+bgMusic = AudioFileClip('audio/LE SSERAFIM - CRAZY.mp3').volumex(0.2).set_duration(duration);
 
 combAud = CompositeAudioClip([audio, bgMusic])
 
 background = ImageClip('background/background.png').set_duration(duration)
 
-text = TextClip(fact, fontsize=50, color='black', font='Arial-Bold', stroke_color='white', stroke_width=2).set_position('center').set_duration(duration).crossfadein(1)    
+text = TextClip(fact, fontsize=70, color='black', font='Arial-Bold', stroke_color='white', stroke_width=2).set_position('center').set_duration(duration).crossfadein(1)    
 
 background = background.set_audio(combAud)
 
