@@ -22,6 +22,7 @@ IMAGEMAGICK_PATH = r"C:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"
 change_settings({"IMAGEMAGICK_BINARY": IMAGEMAGICK_PATH})
 
 def findLenFact():
+    limitPerLine = 20
     arrChoice = []
     api_url = 'https://api.api-ninjas.com/v1/facts'
     response = requests.get(api_url, headers={ 'X-Api-Key': env.API_KEY })
@@ -35,10 +36,15 @@ def findLenFact():
 
     if len(splitStr) >= 10:
         newSplit = []
+        currLen = 0
         for i in range(0, len(splitStr)):
-            newSplit.append(splitStr[i])
-            if (i+1)%4 == 0:
-                newSplit.append('\n')
+            currLen += len(splitStr[i])
+            if currLen > limitPerLine:
+               newSplit.append('\n')
+               currLen = len(splitStr[i])
+               newSplit.append(splitStr[i])
+            else:
+               newSplit.append(splitStr[i])        
     
         combinedSplit = ' '.join(newSplit)  
 
@@ -75,7 +81,7 @@ def get_background():
 
 get_background()
 
-res = requests.get(f'https://api.deezer.com/search/track?q=pop&order=RANKING&limit=50')
+res = requests.get(f'https://api.deezer.com/artist/161553/top?limit=50')
 data = res.json()
 rand = random.randint(0, 49)
 track_url = data['data'][rand]['preview']
@@ -95,7 +101,7 @@ combAud = CompositeAudioClip([spedAud, bgMusic])
 
 background = ImageClip('background/background.png').set_duration(duration)
 
-text = TextClip(fact[0], fontsize=70, color='white', font='Arial-Bold', stroke_color='black', stroke_width=2).set_position('center').set_duration(duration).crossfadein(1)    
+text = TextClip(fact[0], fontsize=70, color='white', font='Arial-Bold', stroke_color='black', stroke_width=3).set_position('center').set_duration(duration).crossfadein(1)    
 
 background = background.set_audio(combAud)
 
@@ -157,7 +163,7 @@ VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 
 VIDEO_FILE_PATH = "facts.mp4"  # Replace with your video file path
 VIDEO_TITLE = "Did you know?"
-VIDEO_DESCRIPTION = "Did you know? " + fact[1]
+VIDEO_DESCRIPTION = "Did you know? " + fact[1] + "#DidYouKnow #FunFacts #RandomFacts #FactOfTheDay #MindBlown #LearnSomethingNew #KnowledgeIsPower #DailyFacts #InterestingFacts #FactsYouDidntKnow #AmazingFacts #StayCurious"
 VIDEO_CATEGORY = "27"  # Example category ID
 VIDEO_KEYWORDS = "Fun, Fact"  # Comma-separated keywords
 VIDEO_PRIVACY_STATUS = "public"  # Choose from "public", "private", "unlisted"
